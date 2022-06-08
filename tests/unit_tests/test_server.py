@@ -57,4 +57,12 @@ def test_book(client, competitions_fixture, clubs_fixture, club, competition):
     assert rv.status_code == 200
 
 
+@pytest.mark.parametrize("competition, club, places", [("Spring Festival", "Iron Temple", "1"),
+                                                       ("Fall Classic", "Iron Temple", "2"),
+                                               ("competition inconnu", "club inconnu", "4")])
+def test_purchasePlaces(client, competitions_fixture, clubs_fixture, competition, club, places):
+    clubs = clubs_fixture
+    competitions = competitions_fixture
+    rv = client.post("/purchasePlaces", data=dict(competition=competition, club=club, places=places))
+    assert rv.status_code == 200
 
