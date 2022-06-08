@@ -1,11 +1,13 @@
 import server
 import pytest
 
+
 @pytest.fixture
 def competitions_fixture():
     data = [{'name': 'Spring Festival', 'date': '2020-03-27 10:00:00', 'numberOfPlaces': '25'},
             {'name': 'Fall Classic', 'date': '2020-10-22 13:30:00', 'numberOfPlaces': '13'}]
     return data
+
 
 @pytest.fixture
 def clubs_fixture():
@@ -15,10 +17,23 @@ def clubs_fixture():
     return data
 
 
+@pytest.fixture
+def client():
+    with server.app.test_client() as client:
+        yield client
+
+
 def test_loadCompetitions(competitions_fixture):
     assert server.loadCompetitions() == competitions_fixture
 
 
 def test_loadClubs(clubs_fixture):
     assert server.loadClubs() == clubs_fixture
+
+
+def test_index_code_ok(client):
+    response = client.get('/')
+    assert response.status_code == 200
+
+
 
