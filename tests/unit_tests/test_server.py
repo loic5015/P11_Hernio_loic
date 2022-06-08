@@ -36,4 +36,9 @@ def test_index_code_ok(client):
     assert response.status_code == 200
 
 
+def test_logout(client):
+    rv = client.get("/logout", follow_redirects=True)
+    assert rv.status_code == 200
+
+
 
