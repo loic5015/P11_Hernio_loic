@@ -1,5 +1,6 @@
 import server
 import pytest
+from flask import url_for
 
 
 @pytest.fixture
@@ -40,9 +41,19 @@ def test_logout(client):
     rv = client.get("/logout", follow_redirects=True)
     assert rv.status_code == 200
 
+
 @pytest.mark.parametrize("email", [("admin@irontemple.com"), ("unknown@gmail.com")])
 def test_show_summary_email(client, email):
     rv = client.post("/showSummary", data=dict(email=email))
+    assert rv.status_code == 200
+
+
+@pytest.mark.parametrize("competition, club", [("Spring Festival", "Iron Temple"), ("Fall Classic", "Iron Temple"),
+                                               ("competition inconnu", "club inconnu")])
+def test_book(client, competitions_fixture, clubs_fixture, club, competition):
+    clubs = clubs_fixture
+    competitions = competitions_fixture
+    rv = client.get(f'book/{competition}/{club}')
     assert rv.status_code == 200
 
 
