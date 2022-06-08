@@ -40,5 +40,10 @@ def test_logout(client):
     rv = client.get("/logout", follow_redirects=True)
     assert rv.status_code == 200
 
+@pytest.mark.parametrize("email", [("admin@irontemple.com"), ("unknown@gmail.com")])
+def test_show_summary_email(client, email):
+    rv = client.post("/showSummary", data=dict(email=email))
+    assert rv.status_code == 200
+
 
 
