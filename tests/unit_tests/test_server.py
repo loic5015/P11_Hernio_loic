@@ -1,6 +1,8 @@
 import server
 import pytest
-from flask import url_for
+from pathlib import Path
+import os
+
 
 
 @pytest.fixture
@@ -15,6 +17,11 @@ def clubs_fixture():
     data = [{'name': 'Simply Lift', 'email': 'john@simplylift.co', 'points': '13'},
             {'name': 'Iron Temple', 'email': 'admin@irontemple.com', 'points': '4'},
             {'name': 'She Lifts', 'email': 'kate@shelifts.co.uk', 'points': '12'}]
+    return data
+
+@pytest.fixture
+def files_fixture():
+    data = [{'file1': 'clubs.json', 'file2': 'competitions.json'}]
     return data
 
 
@@ -66,3 +73,11 @@ def test_purchasePlaces(client, competitions_fixture, clubs_fixture, competition
     rv = client.post("/purchasePlaces", data=dict(competition=competition, club=club, places=places))
     assert rv.status_code == 200
 
+
+def test_files(files_fixture):
+    filename = os.path.join(server.app.root_path, files_fixture[0]['file1'])
+    file_obj = Path(filename)
+    assert file_obj.is_file() == True
+    filename1 = os.path.join(server.app.root_path, files_fixture[0]['file2'])
+    file_obj1 = Path(filename1)
+    assert file_obj1.is_file() == True
