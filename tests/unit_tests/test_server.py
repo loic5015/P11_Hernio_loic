@@ -2,7 +2,7 @@ import server
 import pytest
 from pathlib import Path
 import os
-
+import datetime
 
 
 @pytest.fixture
@@ -50,9 +50,15 @@ def test_logout(client):
 
 
 @pytest.mark.parametrize("email", [("admin@irontemple.com"), ("unknown@gmail.com")])
-def test_show_summary_email(client, email):
+def test_show_summary(client, email, competitions_fixture):
     rv = client.post("/showSummary", data=dict(email=email))
     assert rv.status_code == 200
+    for competition in competitions_fixture:
+        print(competition['date'])
+        if datetime.datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S') < datetime.datetime.now():
+            assert rv.data.decode().find(f'competition closed') != -1
+        else:
+            assert  rv.data.decode().find(f'Book Places') != -1
 
 
 @pytest.mark.parametrize("competition, club", [("Spring Festival", "Iron Temple"), ("Fall Classic", "Iron Temple"),
