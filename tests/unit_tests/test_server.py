@@ -4,11 +4,20 @@ from pathlib import Path
 import os
 import datetime
 
+MAX_PLACES_COMPETITION = 12
+
 
 @pytest.fixture
 def competitions_fixture():
     data = [{'name': 'Spring Festival', 'date': '2020-03-27 10:00:00', 'numberOfPlaces': '25'},
             {'name': 'Fall Classic', 'date': '2020-10-22 13:30:00', 'numberOfPlaces': '13'}]
+    return data
+
+
+@pytest.fixture
+def max_places_competitions_fixture():
+    data = [{'competition': 'Spring Festival', 'club': 'Iron Temple', 'places': '12'},
+            {'competition': 'Fall Classic', 'club': 'Iron Temple', 'places': '6'}]
     return data
 
 
@@ -73,11 +82,22 @@ def test_book(client, competitions_fixture, clubs_fixture, club, competition):
 @pytest.mark.parametrize("competition, club, places", [("Spring Festival", "Iron Temple", "1"),
                                                        ("Fall Classic", "Iron Temple", "2"),
                                                ("competition inconnu", "club inconnu", "4")])
-def test_purchasePlaces(client, competitions_fixture, clubs_fixture, competition, club, places):
+def test_purchasePlaces(client, competitions_fixture, clubs_fixture, competition, max_places_competitions_fixture,
+                        club, places):
     clubs = clubs_fixture
     competitions = competitions_fixture
     rv = client.post("/purchasePlaces", data=dict(competition=competition, club=club, places=places))
+    n = 0
     assert rv.status_code == 200
+    for max_places_competitions_club in max_places_competitions_fixture:
+        if competition == max_places_competitions_club['competition'] and club == max_places_competitions_club['club']\
+                and int(places) + int(max_places_competitions_club['places']) > MAX_PLACES_COMPETITION:
+            assert rv.data.decode().find(f'Your choice for this competition exceeds the number of places available for'
+                                         f' your club') != -1
+        else:
+            max_places_competitions_fixture[n]['places'] = str(int(places) + int(max_places_competitions_club['places']))
+            assert rv.data.decode().find(f'Great-booking complete!') != -1
+        n += 1
 
 
 def test_files(files_fixture):
@@ -87,3 +107,6 @@ def test_files(files_fixture):
     filename1 = os.path.join(server.app.root_path, files_fixture[0]['file2'])
     file_obj1 = Path(filename1)
     assert file_obj1.is_file() == True
+
+
+
