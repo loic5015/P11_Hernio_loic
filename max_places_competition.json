@@ -1,0 +1,15 @@
+
+{
+    "max_places_competition": [
+        {
+            "competition": "Spring Festival",
+            "club": "Iron Temple",
+            "places": "12"
+        },
+        {
+            "competition": "Fall Classic",
+            "club": "Iron Temple",
+            "places": "6"
+        }
+    ]
+}

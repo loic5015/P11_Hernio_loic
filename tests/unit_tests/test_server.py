@@ -80,7 +80,10 @@ def test_book(client, competitions_fixture, clubs_fixture, club, competition):
     clubs = clubs_fixture
     competitions = competitions_fixture
     rv = client.get(f'book/{competition}/{club}')
-    assert rv.status_code == 200
+    if competition == "competition inconnu"  or club == "club inconnu":
+        assert rv.status_code == 404
+    else:
+        assert rv.status_code == 200
 
 
 @pytest.mark.parametrize("competition, club, places", [("Spring Festival", "Iron Temple", "1"),
@@ -92,16 +95,19 @@ def test_purchasePlaces(client, competitions_fixture, clubs_fixture, competition
     competitions = competitions_fixture
     rv = client.post("/purchasePlaces", data=dict(competition=competition, club=club, places=places))
     n = 0
-    assert rv.status_code == 200
-    for max_places_competitions_club in max_places_competitions_fixture:
-        if competition == max_places_competitions_club['competition'] and club == max_places_competitions_club['club']\
-                and int(places) + int(max_places_competitions_club['places']) > MAX_PLACES_COMPETITION:
-            assert rv.data.decode().find(f'Your choice for this competition exceeds the number of places available for'
-                                         f' your club') != -1
-        else:
-            max_places_competitions_fixture[n]['places'] = str(int(places) + int(max_places_competitions_club['places']))
-            assert rv.data.decode().find(f'Great-booking complete!') != -1
-        n += 1
+    if competition == "competition inconnu" or club == "club inconnu":
+        assert rv.status_code == 404
+    else:
+        assert rv.status_code == 200
+        for max_places_competitions_club in max_places_competitions_fixture:
+            if competition == max_places_competitions_club['competition'] and club == max_places_competitions_club['club']\
+                    and int(places) + int(max_places_competitions_club['places']) > MAX_PLACES_COMPETITION:
+                assert rv.data.decode().find(f'Your choice for this competition exceeds the number of places available for'
+                                             f' your club') != -1
+            else:
+                max_places_competitions_fixture[n]['places'] = str(int(places) + int(max_places_competitions_club['places']))
+                assert rv.data.decode().find(f'Great-booking complete!') != -1
+            n += 1
 
 
 def test_files(files_fixture):

@@ -39,20 +39,22 @@ def book(competition,club):
     foundClub = [c for c in clubs if c['name'] == club]
     foundCompetition = [c for c in competitions if c['name'] == competition]
     if not foundClub or not foundCompetition:
-        flash("Something went wrong-please try again")
-        return render_template('welcome.html', club=club, competitions=competitions, datetime=datetime)
+        return render_template('404.html', title='404'), 404
     else:
         return render_template('booking.html', club=foundClub[0], competition=foundCompetition[0])
 
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
-    placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    competition = [c for c in competitions if c['name'] == request.form['competition']]
+    club = [c for c in clubs if c['name'] == request.form['club']]
+    if not club or not competition:
+        return render_template('404.html', title='404'), 404
+    else:
+        placesRequired = int(request.form['places'])
+        competition[0]['numberOfPlaces'] = int(competition[0]['numberOfPlaces'])-placesRequired
+        flash('Great-booking complete!')
+        return render_template('welcome.html', club=club[0], competitions=competitions)
 
 
 # TODO: Add route for points display
