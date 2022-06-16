@@ -10,7 +10,8 @@ MAX_PLACES_COMPETITION = 12
 @pytest.fixture
 def competitions_fixture():
     data = [{'name': 'Spring Festival', 'date': '2020-03-27 10:00:00', 'numberOfPlaces': '25'},
-            {'name': 'Fall Classic', 'date': '2020-10-22 13:30:00', 'numberOfPlaces': '13'}]
+            {'name': 'Fall Classic', 'date': '2020-10-22 13:30:00', 'numberOfPlaces': '13'},
+            {'name': 'ex competition', 'date': '2023-10-22 13:30:00', 'numberOfPlaces': '13'}]
     return data
 
 
@@ -68,7 +69,7 @@ def test_show_summary(client, email, competitions_fixture):
         for competition in competitions_fixture:
             print(competition['date'])
             if datetime.datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S') < datetime.datetime.now():
-                assert rv.data.decode().find(f'competition closed') != -1
+                assert rv.data.decode().find(f'Competition closed') != -1
             else:
                 assert rv.data.decode().find(f'Book Places') != -1
 

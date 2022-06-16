@@ -1,5 +1,6 @@
 import json
 from flask import Flask,render_template,request,redirect,flash,url_for
+import datetime
 
 
 def loadClubs():
@@ -30,7 +31,7 @@ def showSummary():
     if not club_list:
         flash("Something went wrong-Email unknow")
         return render_template('index.html')
-    return render_template('welcome.html',club=club_list[0],competitions=competitions)
+    return render_template('welcome.html',club=club_list[0],competitions=competitions, datetime=datetime)
 
 
 @app.route('/book/<competition>/<club>')
