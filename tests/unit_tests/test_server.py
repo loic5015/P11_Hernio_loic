@@ -62,12 +62,15 @@ def test_logout(client):
 def test_show_summary(client, email, competitions_fixture):
     rv = client.post("/showSummary", data=dict(email=email))
     assert rv.status_code == 200
-    for competition in competitions_fixture:
-        print(competition['date'])
-        if datetime.datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S') < datetime.datetime.now():
-            assert rv.data.decode().find(f'competition closed') != -1
-        else:
-            assert  rv.data.decode().find(f'Book Places') != -1
+    if email == "unknown@gmail.com":
+        assert rv.data.decode().find(f'GUDLFT Registration') != -1
+    else:
+        for competition in competitions_fixture:
+            print(competition['date'])
+            if datetime.datetime.strptime(competition['date'], '%Y-%m-%d %H:%M:%S') < datetime.datetime.now():
+                assert rv.data.decode().find(f'competition closed') != -1
+            else:
+                assert rv.data.decode().find(f'Book Places') != -1
 
 
 @pytest.mark.parametrize("competition, club", [("Spring Festival", "Iron Temple"), ("Fall Classic", "Iron Temple"),
