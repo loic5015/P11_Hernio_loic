@@ -68,6 +68,8 @@ def purchasePlaces():
         placesRequired = int(request.form['places'])
         if check_max_point_reached(club, placesRequired):
             return render_template('welcome.html', club=club[0], competitions=competitions, datetime=datetime)
+        if max_place_competition_reached(competition, placesRequired):
+            return render_template('welcome.html', club=club[0], competitions=competitions, datetime=datetime)
         club_and_competition_find = False
         for max_places_competitions_club in max_places_competition:
             if competition[0]["name"] == max_places_competitions_club['competition'] and club[0]["name"] == max_places_competitions_club['club']:
@@ -106,6 +108,12 @@ def check_max_point_reached(club, placesRequired):
     if int(club[0]['points']) < placesRequired*COEFFICIENT:
         flash(f'You have exceeded the maximum number of points allowed !!')
         return True
+
+def max_place_competition_reached(competition, places):
+    if int(competition[0]["numberOfPlaces"]) < places:
+        flash(f'The number of places requested exceeds the number of places remaining for the competition!')
+        return True
+
 
 def update_points_versus_place(club, placesRequired):
     club[0]['points'] = str(int(club[0]['points']) - placesRequired * COEFFICIENT)
