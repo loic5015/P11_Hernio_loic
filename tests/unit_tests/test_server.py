@@ -111,19 +111,6 @@ def test_files(files_fixture):
         file_obj = Path(filename)
         assert file_obj.is_file() == True
 
-
-@pytest.mark.parametrize("club, place", [("Simply Lift", 13), ("Iron Temple", 2)])
-def test_check_max_point_reached(club, place, clubs_fixture):
-    for key, value in clubs_fixture[0].items():
-        if key == club:
-            if int(value) < place:
-                rv = client.post("/showSummary", data=dict(competitions=competitions, club=club, datetime=datetime))
-                assert rv.status_code == 200
-                assert rv.data.decode('You have exceeded the maximum number of points allowed').find() != 1
-            else:
-                assert None
-
-
 def test_index(client):
     rv = client.get("/", follow_redirects=True)
     assert rv.status_code == 200
