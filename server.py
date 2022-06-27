@@ -32,6 +32,7 @@ clubs = loadClubs()
 max_places_competition = loadMaxPlacesCompetition()
 
 MAX_PLACES_COMPETITION = 12
+COEFFICIENT = 1
 
 @app.route('/')
 def index():
@@ -65,6 +66,8 @@ def purchasePlaces():
     else:
         n = 0
         placesRequired = int(request.form['places'])
+        if check_max_point_reached(club, placesRequired):
+            return render_template('welcome.html', club=club[0], competitions=competitions, datetime=datetime)
         club_and_competition_find = False
         for max_places_competitions_club in max_places_competition:
             if competition[0]["name"] == max_places_competitions_club['competition'] and club[0]["name"] == max_places_competitions_club['club']:
@@ -75,6 +78,10 @@ def purchasePlaces():
                     max_places_competition[n]['places'] = placesRequired + int(max_places_competitions_club['places'])
                     competition[0]['numberOfPlaces'] = int(competition[0]['numberOfPlaces']) - placesRequired
                     flash('Great-booking complete!')
+                    max_places = {}
+                    max_places['max_places_competition'] = max_places_competition
+                    saveMaxPlacesCompetition(max_places)
+                    club = update_points_versus_place(club, placesRequired)
                     club_and_competition_find = True
             n += 1
         if not club_and_competition_find:
@@ -86,14 +93,23 @@ def purchasePlaces():
                 max_places_competition.append(record_new)
                 competition[0]['numberOfPlaces'] = int(competition[0]['numberOfPlaces']) - placesRequired
                 flash('Great-booking complete!')
+                max_places = {}
+                max_places['max_places_competition'] = max_places_competition
+                saveMaxPlacesCompetition(max_places)
+                club = update_points_versus_place(club, placesRequired)
             else:
                 flash(f'Your choice for this competition exceeds the number of places available for your club')
-
-        max_places = {}
-        max_places['max_places_competition'] = max_places_competition
-        saveMaxPlacesCompetition(max_places)
         return render_template('welcome.html', club=club[0], competitions=competitions, datetime=datetime)
 
+
+def check_max_point_reached(club, placesRequired):
+    if int(club[0]['points']) < placesRequired*COEFFICIENT:
+        flash(f'You have exceeded the maximum number of points allowed !!')
+        return True
+
+def update_points_versus_place(club, placesRequired):
+    club[0]['points'] = str(int(club[0]['points']) - placesRequired * COEFFICIENT)
+    return club
 
 # TODO: Add route for points display
 

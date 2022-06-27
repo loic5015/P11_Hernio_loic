@@ -17,7 +17,7 @@ def competitions_fixture():
 
 @pytest.fixture
 def max_places_competitions_fixture():
-    data = [{'competition': 'Spring Festival', 'club': 'Iron Temple', 'places': '12'},
+    data = [{'competition': 'Spring Festival', 'club': 'Iron Temple', 'places': '1'},
             {'competition': 'Fall Classic', 'club': 'Iron Temple', 'places': '6'}]
     return data
 
@@ -31,7 +31,7 @@ def clubs_fixture():
 
 @pytest.fixture
 def files_fixture():
-    data = [{'file1': 'clubs.json', 'file2': 'competitions.json'}]
+    data = [{'file1': 'clubs.json', 'file2': 'competitions.json', 'file3': 'max_places_competition.json'}]
     return data
 
 
@@ -106,12 +106,21 @@ def test_purchasePlaces(client, competition, max_places_competitions_fixture,
             n += 1
 
 def test_files(files_fixture):
-    filename = os.path.join(server.app.root_path, files_fixture[0]['file1'])
-    file_obj = Path(filename)
-    assert file_obj.is_file() == True
-    filename1 = os.path.join(server.app.root_path, files_fixture[0]['file2'])
-    file_obj1 = Path(filename1)
-    assert file_obj1.is_file() == True
+    for value in files_fixture[0].values():
+        filename = os.path.join(server.app.root_path, value)
+        file_obj = Path(filename)
+        assert file_obj.is_file() == True
 
+
+@pytest.mark.parametrize("club, place", [("Simply Lift", 13), ("Iron Temple", 2)])
+def test_check_max_point_reached(club, place, clubs_fixture):
+    for key, value in clubs_fixture[0].items():
+        if key == club:
+            if int(value) < place:
+                rv = client.post("/showSummary", data=dict(competitions=competitions, club=club, datetime=datetime))
+                assert rv.status_code == 200
+                assert rv.data.decode('You have exceeded the maximum number of points allowed').find() != 1
+            else:
+                assert None
 
 
