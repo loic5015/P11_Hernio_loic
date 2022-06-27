@@ -38,6 +38,10 @@ COEFFICIENT = 1
 def index():
     return render_template('index.html')
 
+@app.route('/list_club')
+def list_club():
+    return render_template('list_clubs.html', clubs=clubs)
+
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
     club_list = [club for club in clubs if club['email'] == request.form['email']]

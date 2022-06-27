@@ -124,3 +124,10 @@ def test_check_max_point_reached(club, place, clubs_fixture):
                 assert None
 
 
+def test_index(client):
+    rv = client.get("/", follow_redirects=True)
+    assert rv.status_code == 200
+
+def test_list_club(client):
+    rv = client.get("/list_club", follow_redirects=True)
+    assert rv.status_code == 200
