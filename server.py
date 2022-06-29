@@ -34,7 +34,7 @@ clubs = loadClubs()
 max_places_competition = loadMaxPlacesCompetition()
 
 MAX_PLACES_COMPETITION = 12
-COEFFICIENT = 1
+COEFFICIENT = 3
 
 
 @app.route('/')
