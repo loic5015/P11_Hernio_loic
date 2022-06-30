@@ -9,7 +9,7 @@ class ServerPerfTest(HttpUser):
 
     @task
     def index(self):
-        self.client.get("/index")
+        self.client.get("/")
 
     @task
     def show_summary(self):
